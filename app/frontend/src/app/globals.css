@@ -1,0 +1,119 @@
+@import "tailwindcss";
+
+:root {
+  /* ───── Paleta Coffee Vibes — basada en tueste real de grano ───── */
+  --crudo: #f7f3ec;        /* fondo base, papel kraft claro */
+  --pergamino: #fbf8f2;    /* superficie de tarjetas */
+  --pergamino-2: #f1e9da;  /* superficie secundaria / hover */
+  --espresso: #2b1b14;     /* texto principal, casi negro tostado */
+  --tueste: #8c4a2f;       /* marrón tostado — primario */
+  --tueste-oscuro: #4a2818;/* CTA fuerte */
+  --tueste-claro: #b9714c; /* hover de primario */
+  --oliva: #6b7a4f;        /* acento secundario, grano crudo */
+  --oliva-oscuro: #4f5b39;
+  --miel: #c98a3a;         /* highlight / precios */
+  --miel-claro: #e3ad6b;
+  --linea: #e2d6c3;        /* bordes, hairlines */
+  --linea-fuerte: #cdbb9c;
+  --rojo-error: #a33b2e;
+  --verde-ok: #4f7a4f;
+
+  --font-display: var(--font-fraunces);
+  --font-body: var(--font-inter);
+  --font-mono: var(--font-jbmono);
+}
+
+@theme inline {
+  --color-crudo: var(--crudo);
+  --color-pergamino: var(--pergamino);
+  --color-pergamino-2: var(--pergamino-2);
+  --color-espresso: var(--espresso);
+  --color-tueste: var(--tueste);
+  --color-tueste-oscuro: var(--tueste-oscuro);
+  --color-tueste-claro: var(--tueste-claro);
+  --color-oliva: var(--oliva);
+  --color-oliva-oscuro: var(--oliva-oscuro);
+  --color-miel: var(--miel);
+  --color-miel-claro: var(--miel-claro);
+  --color-linea: var(--linea);
+  --color-linea-fuerte: var(--linea-fuerte);
+  --color-rojo-error: var(--rojo-error);
+  --color-verde-ok: var(--verde-ok);
+
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-mono: var(--font-mono);
+}
+
+* {
+  border-color: var(--linea);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--crudo);
+  color: var(--espresso);
+  font-family: var(--font-body);
+}
+
+/* Textura sutil de papel — muy tenue */
+.bg-grain {
+  background-image: radial-gradient(circle at 1px 1px, rgba(43, 27, 20, 0.045) 1px, transparent 0);
+  background-size: 18px 18px;
+}
+
+/* Líneas tipo "ticket" punteado horizontal */
+.dash-line {
+  background-image: repeating-linear-gradient(
+    to right,
+    var(--linea-fuerte) 0,
+    var(--linea-fuerte) 6px,
+    transparent 6px,
+    transparent 12px
+  );
+  height: 1px;
+}
+
+/* Sello circular de origen — signature element */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.seal-spin {
+  animation: spin-slow 28s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .seal-spin {
+    animation: none;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--tueste);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--crudo);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--linea-fuerte);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--tueste-claro);
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
