@@ -15,4 +15,9 @@ const getPaymentByOrder = async (req, res) => {
   res.json({ success: true, data: payment });
 };
 
-module.exports = { createPreference, handleWebhook, getPaymentByOrder };
+const verifyPayment = async (req, res) => {
+  const result = await paymentService.verifyPayment(req.user.id, parseInt(req.params.orderId));
+  res.json({ success: true, data: result });
+};
+
+module.exports = { createPreference, handleWebhook, getPaymentByOrder, verifyPayment };

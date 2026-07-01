@@ -83,14 +83,14 @@ export function CheckoutView() {
       const preference = await paymentsApi.createPreference(order.id);
 
       clearCart();
-      toast.success("Pedido creado. Redirigiendo a Mercado Pago...");
+      toast.success("Pedido creado. Abriendo Mercado Pago...");
 
+      // Abre Mercado Pago en nueva pestaña y redirige la página actual al pedido
       const checkoutUrl = preference.initPoint || preference.sandboxInitPoint;
       if (checkoutUrl) {
-        window.location.href = checkoutUrl;
-      } else {
-        router.push(`/pedidos/${order.id}`);
+        window.open(checkoutUrl, "_blank", "noopener,noreferrer");
       }
+      router.push(`/pedidos/${order.id}`);
     } catch (err) {
       toast.error(getApiErrorMessage(err));
     } finally {

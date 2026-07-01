@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { ChevronLeft, MapPin, Store } from "lucide-react";
 import { useAsyncData } from "@/hooks/use-async-data";
@@ -26,6 +26,40 @@ export function OrderDetailView({ orderId }: { orderId: number }) {
     [orderId]
   );
   const [retryingPayment, setRetryingPayment] = useState(false);
+  const [verifying, setVerifying] = useState(false);
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Polling: si el pedido sigue pendiente, intenta verificar el pago cada 5s
+  // consultando directamente la API de Mercado Pago.
+  useEffect(() => {
+    if (order && order.status === "PENDING") {
+      pollingRef.current = setInterval(async () => {
+        try {
+          await paymentsApi.verifyPayment(orderId);
+          refetch();
+        } catch {
+          // ignorar errores de polling
+        }
+      }, 5000);
+    }
+    return () => {
+      if (pollingRef.current) {
+        clearInterval(pollingRef.current);
+        pollingRef.current = null;
+      }
+    };
+  }, [order?.status, orderId, refetch]);
+
+  // Cuando el estado cambia de PENDING a PAID, mostramos notificación
+  const wasPending = useRef(true);
+  useEffect(() => {
+    if (order && !wasPending.current && order.status === "PAID") {
+      toast.success("¡Pago confirmado! Tu pedido ya está en proceso.");
+    }
+    if (order) {
+      wasPending.current = order.status === "PENDING";
+    }
+  }, [order?.status]);
 
   async function handleRetryPayment() {
     setRetryingPayment(true);
@@ -73,13 +107,40 @@ export function OrderDetailView({ orderId }: { orderId: number }) {
       </div>
 
       {order.status === "PENDING" && (
-        <div className="mt-4 flex items-center justify-between rounded-sm border border-miel bg-miel-claro/10 px-4 py-3">
+        <div className="mt-4 rounded-sm border border-miel bg-miel-claro/10 px-4 py-3">
           <p className="text-sm text-tueste-oscuro">
             Este pedido aún no tiene un pago confirmado.
           </p>
-          <Button size="sm" loading={retryingPayment} onClick={handleRetryPayment}>
-            Pagar ahora
-          </Button>
+          <div className="mt-3 flex gap-2">
+            <Button size="sm" loading={retryingPayment} onClick={handleRetryPayment}>
+              Pagar ahora
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              loading={verifying}
+              onClick={async () => {
+                setVerifying(true);
+                try {
+                  const result = await paymentsApi.verifyPayment(orderId);
+                  refetch();
+                  if (result.status === "APPROVED") {
+                    toast.success("¡Pago confirmado!");
+                  } else if (result.status === "PENDING") {
+                    toast.info(result.message || "Aún no se detecta el pago. Vuelve a intentar después de pagar.");
+                  } else {
+                    toast.error("El pago fue rechazado.");
+                  }
+                } catch (err) {
+                  toast.error(getApiErrorMessage(err));
+                } finally {
+                  setVerifying(false);
+                }
+              }}
+            >
+              Ya pagué, verificar
+            </Button>
+          </div>
         </div>
       )}
 

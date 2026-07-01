@@ -16,4 +16,11 @@ export const paymentsApi = {
     );
     return data.data;
   },
+
+  async verifyPayment(orderId: number) {
+    const { data } = await api.post<
+      ApiSuccess<{ status: string; message?: string }>
+    >(`/payments/verify/${orderId}`);
+    return data.data;
+  },
 };

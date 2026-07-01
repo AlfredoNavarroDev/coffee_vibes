@@ -25,4 +25,11 @@ router.get(
   paymentController.getPaymentByOrder
 );
 
+router.post(
+  "/verify/:orderId",
+  authenticate,
+  [param("orderId").isInt().withMessage("ID de pedido invalido"), validate],
+  paymentController.verifyPayment
+);
+
 module.exports = router;
